@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
-  const data = await request.json();
-
-  // Tenta pegar o IP do cabeçalho ou da conexão direta
+export async function GET(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded?.split(",")[0] || "IP desconhecido";
+  const ip = forwarded?.split(",")[0] || "8.8.8.8"; // fallback
 
-  console.log("📍 Geolocalização do usuário recebida:");
-  console.log({
-    ...data,
-    ip,
-  });
+  const response = await fetch(`https://ipapi.co/${ip}/json/`);
+  const data = await response.json();
 
-  return NextResponse.json({ ok: true });
+  console.log("📦 Dados de localização via IP:", data);
+
+  return NextResponse.json({ location: data });
 }
